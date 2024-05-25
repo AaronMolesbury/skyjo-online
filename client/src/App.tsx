@@ -30,7 +30,7 @@ function App() {
     ws.addEventListener("message", (event) => {
       setData(JSON.parse(event.data as string));
     });
-  })
+  }, [])
 
   return (
     <WebSocketContext.Provider value={socket}>
