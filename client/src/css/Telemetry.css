@@ -1,0 +1,9 @@
+.Telemetry {
+    position: absolute;
+}
+
+.Telemetry_Data {
+    font-size: 20px;
+    color: green;
+    background-color: rgba(0, 0, 0, .9);
+}

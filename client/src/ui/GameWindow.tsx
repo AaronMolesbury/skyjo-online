@@ -1,32 +1,33 @@
 import { useData, useWebSocket } from "../App"
 import "../css/GameWindow.css"
+import Button from "./Button";
+import CardGrid from "./CardGrid";
+import Telemetry from "./Telemetry";
+import FlipTwo from "./gamestates/FlipTwo";
+import ForceSwap from "./gamestates/ForceSwap";
+import SwapDiscard from "./gamestates/SwapDiscard";
+import TakeFrom from "./gamestates/TakeFrom";
 
 function GameWindow() {
     const ws = useWebSocket();
     const data = useData();
 
     if (!ws) {
+        // TEMP while no landing screen
         return (
             <div>Loading...</div>
         )
     }
 
     const readyUpClicked = () => {
-        console.log("clicked deez")
         ws.send("ready");
     }
 
     if (!data) {
         return (
             <div className="GameWindow">
-                <div className="GameWindow_DeckWrapper">
-                </div>
                 <div className="GameWindow_ButtonWrapper">
-                    <div className="GameWindow_Button" onClick={readyUpClicked}>
-                        <div className="GameWindow_ButtonLabel">
-                            Ready Up
-                        </div>
-                    </div>
+                   <Button clickHandler={readyUpClicked} labelText="Ready Up"/>
                 </div>
             </div>
         )
@@ -34,28 +35,48 @@ function GameWindow() {
 
     const playerId = data.playerId;
     const hand = data.players[playerId].hand;
-   
-    const cardsComponent = hand.map((row, i) => (
-        <div className="GameWindow_CardRow" key={i}>
-            {row.map((card, i) => (
-                <div className="GameWindow_Card" key={i}>
-                    {card?.value}
-                </div>
-            ))}
-        </div>
-    ))
+    
+    let currentGameState: JSX.Element;
+    switch (data.gameState) {
+        case "flip-two":
+            currentGameState = (
+                <FlipTwo/>
+            )
+            break;
+        case "take-from":
+            currentGameState = (
+                <TakeFrom/>
+            )
+            break;
+        case "swap-discard":
+            currentGameState = (
+                <SwapDiscard/>
+            )
+            break;
+        case "force-swap":
+            currentGameState = (
+                <ForceSwap/>
+            )
+            break;
+        default:
+            currentGameState = (
+                <div>Bad Game State...</div>
+            )
+    }
 
     return (
         <div className="GameWindow">
+            <Telemetry 
+                playerServerId={playerId}
+                gameState={data.gameState}
+                cardInHandValue={data.cardInHand.value}
+                lastDiscardedCardValue={data.lastDiscardedCard.value}
+            />
             <div className="GameWindow_DeckWrapper">
-                {cardsComponent}
+                <CardGrid hand={hand}/>
             </div>
             <div className="GameWindow_ButtonWrapper">
-                <div className="GameWindow_Button" onClick={readyUpClicked}>
-                    <div className="GameWindow_ButtonLabel">
-                        Ready Up
-                    </div>
-                </div>
+                {currentGameState}
             </div>
         </div>
     )

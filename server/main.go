@@ -8,6 +8,8 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"nhooyr.io/websocket"
 )
@@ -32,8 +34,12 @@ type socketDataPlayer struct {
 }
 
 type socketData struct {
-	PlayerID int                `json:"playerId"`
-	Players  []socketDataPlayer `json:"players"`
+	DiscardCard      *socketDataCard    `json:"lastDiscardedCard"`
+	CardInHand       *socketDataCard    `json:"cardInHand"`
+	GameState        string             `json:"gameState"`
+	PlayerID         int                `json:"playerId"`
+	Players          []socketDataPlayer `json:"players"`
+	CardClickEnabled bool               `json:"cardClickEnabled"`
 }
 
 const (
@@ -45,9 +51,13 @@ const (
 )
 
 var (
-	players     []*player
-	deck        []card
-	discardPile []card
+	players           []*player
+	deck              []card
+	lastDiscardedCard card
+	currentCard       card
+	currentGameState  string
+	canClick          bool
+	cardsFlipped      int
 )
 
 func main() {
@@ -76,16 +86,41 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		if err != nil || msgType != websocket.MessageText {
 			return
 		}
-		fmt.Println(string(msg))
-		switch string(msg) {
+
+		m := strings.Split(string(msg), ";")
+		msgCmd := m[0]
+
+		switch msgCmd {
 		case "ready":
 			ready(player)
+		case "take-from-deck":
+			currentCard = takeFromDeck()
+			currentGameState = "swap-discard"
+			canClick = true
+		case "take-from-discard":
+			currentCard = lastDiscardedCard
+			currentGameState = "force-swap"
+			canClick = true
+		case "discard":
+			lastDiscardedCard = currentCard
+			currentGameState = "flip"
+		case "card-clicked":
+			col, err := strconv.Atoi(m[1])
+			if err != nil {
+				return
+			}
+			row, err := strconv.Atoi(m[2])
+			if err != nil {
+				return
+			}
+			cardClicked(player.hand[row][col])
 		}
+
+		broadcastState()
 	}
 }
 
 func broadcastState() {
-	fmt.Println("broadcasting")
 	var socketPlayers []socketDataPlayer
 	for _, player := range players {
 		socketPlayer := socketDataPlayer{}
@@ -106,15 +141,18 @@ func broadcastState() {
 	}
 	for i, player := range players {
 		b, _ := json.Marshal(socketData{
-			PlayerID: i,
-			Players:  socketPlayers,
+			DiscardCard:      &socketDataCard{Value: &lastDiscardedCard.value},
+			CardInHand:       &socketDataCard{Value: &currentCard.value},
+			GameState:        currentGameState,
+			PlayerID:         i,
+			Players:          socketPlayers,
+			CardClickEnabled: canClick,
 		})
 		player.conn.Write(context.Background(), websocket.MessageText, b)
 	}
 }
 
 func ready(player *player) {
-	fmt.Println("ready")
 	player.ready = true
 	for _, p := range players {
 		if !p.ready {
@@ -125,9 +163,8 @@ func ready(player *player) {
 }
 
 func beginGame() {
-	fmt.Println("begin")
 	resetDeck()
-	discardPile = append(discardPile, takeFromDeck())
+	lastDiscardedCard = takeFromDeck()
 	for _, player := range players {
 		for row := 0; row < 3; row++ {
 			player.hand = append(player.hand, make([]*card, 4))
@@ -137,13 +174,14 @@ func beginGame() {
 			}
 		}
 	}
-	broadcastState()
+
+	currentGameState = "flip-two"
+	canClick = true
 }
 
 func resetDeck() {
-	fmt.Println("reset")
-
 	deck = deck[:0]
+	currentCard = card{}
 
 	for i := 0; i < 5; i++ {
 		deck = append(deck, card{value: -2})
@@ -164,11 +202,35 @@ func resetDeck() {
 }
 
 func takeFromDeck() card {
-	fmt.Println("take")
-
 	randI := rand.Intn(len(deck))
 	card := deck[randI]
 	// TODO
 	deck = append(deck[:randI], deck[randI+1:]...)
 	return card
+}
+
+func cardClicked(cardClicked *card) {
+	if currentGameState == "flip-two" {
+		if cardsFlipped < 1 {
+			cardClicked.faceUp = true
+			cardsFlipped += 1
+		} else {
+			cardClicked.faceUp = true
+			cardsFlipped += 1
+			currentGameState = "take-from"
+			canClick = false
+		}
+		return
+	} else if currentGameState == "flip" {
+		cardClicked.faceUp = true
+		currentGameState = "take-from"
+		canClick = false
+		return
+	} else { // Swap
+		lastDiscardedCard = card{value: cardClicked.value}
+		cardClicked.value = currentCard.value
+		cardClicked.faceUp = true
+		canClick = false
+		currentGameState = "take-from"
+	}
 }

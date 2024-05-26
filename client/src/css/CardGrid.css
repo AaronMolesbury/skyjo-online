@@ -1,0 +1,25 @@
+.CardGrid {
+    display: flex;
+    flex-direction: column;
+}
+
+.CardGrid_Row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.CardGrid_Card {
+    width: 150px;
+    height: 200px;
+    padding: 20px;
+    margin: 20px;
+    background-color: white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.CardGrid_Card:hover {
+    background-color: grey;
+}
