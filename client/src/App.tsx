@@ -19,7 +19,6 @@ export function useData() {
 function App() {
   const [data, setData] = useState<ISocketData|null>(null);
   const [socket, setSocket] = useState<WebSocket|null>(null)
-  alert("deez");
 
   useEffect(() => {
     // Create WebSocket connection.
@@ -30,6 +29,10 @@ function App() {
     ws.addEventListener("message", (event) => {
       setData(JSON.parse(event.data as string));
     });
+
+    return () => {
+      ws.close()
+    }
   }, [])
 
   return (

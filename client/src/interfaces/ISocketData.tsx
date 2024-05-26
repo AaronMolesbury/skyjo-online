@@ -1,3 +1,6 @@
 export interface ISocketData {
-    data: string
+    playerId: number,
+    players: {
+        hand: ({value: number | null}|null)[][]
+    }[]
 }
