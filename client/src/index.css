@@ -9,3 +9,7 @@ body,html,#root {
 * {
     box-sizing: border-box;
 }
+
+.disabled {
+    pointer-events: none;
+}

@@ -34,12 +34,11 @@ type socketDataPlayer struct {
 }
 
 type socketData struct {
-	DiscardCard      *socketDataCard    `json:"lastDiscardedCard"`
-	CardInHand       *socketDataCard    `json:"cardInHand"`
-	GameState        string             `json:"gameState"`
-	PlayerID         int                `json:"playerId"`
-	Players          []socketDataPlayer `json:"players"`
-	CardClickEnabled bool               `json:"cardClickEnabled"`
+	DiscardCard *socketDataCard    `json:"lastDiscardedCard"`
+	CardInHand  *socketDataCard    `json:"cardInHand"`
+	GameState   string             `json:"gameState"`
+	PlayerID    int                `json:"playerId"`
+	Players     []socketDataPlayer `json:"players"`
 }
 
 const (
@@ -56,7 +55,6 @@ var (
 	lastDiscardedCard card
 	currentCard       card
 	currentGameState  string
-	canClick          bool
 	cardsFlipped      int
 )
 
@@ -96,11 +94,9 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		case "take-from-deck":
 			currentCard = takeFromDeck()
 			currentGameState = "swap-discard"
-			canClick = true
 		case "take-from-discard":
 			currentCard = lastDiscardedCard
 			currentGameState = "force-swap"
-			canClick = true
 		case "discard":
 			lastDiscardedCard = currentCard
 			currentGameState = "flip"
@@ -115,7 +111,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 			}
 			cardClicked(player.hand[row][col])
 		}
-
+		checkRowCol(player.hand)
 		broadcastState()
 	}
 }
@@ -141,12 +137,11 @@ func broadcastState() {
 	}
 	for i, player := range players {
 		b, _ := json.Marshal(socketData{
-			DiscardCard:      &socketDataCard{Value: &lastDiscardedCard.value},
-			CardInHand:       &socketDataCard{Value: &currentCard.value},
-			GameState:        currentGameState,
-			PlayerID:         i,
-			Players:          socketPlayers,
-			CardClickEnabled: canClick,
+			DiscardCard: &socketDataCard{Value: &lastDiscardedCard.value},
+			CardInHand:  &socketDataCard{Value: &currentCard.value},
+			GameState:   currentGameState,
+			PlayerID:    i,
+			Players:     socketPlayers,
 		})
 		player.conn.Write(context.Background(), websocket.MessageText, b)
 	}
@@ -176,7 +171,6 @@ func beginGame() {
 	}
 
 	currentGameState = "flip-two"
-	canClick = true
 }
 
 func resetDeck() {
@@ -218,19 +212,83 @@ func cardClicked(cardClicked *card) {
 			cardClicked.faceUp = true
 			cardsFlipped += 1
 			currentGameState = "take-from"
-			canClick = false
 		}
 		return
 	} else if currentGameState == "flip" {
 		cardClicked.faceUp = true
 		currentGameState = "take-from"
-		canClick = false
 		return
 	} else { // Swap
 		lastDiscardedCard = card{value: cardClicked.value}
 		cardClicked.value = currentCard.value
 		cardClicked.faceUp = true
-		canClick = false
 		currentGameState = "take-from"
+	}
+}
+
+func checkRowCol(hand [][]*card) {
+	fmt.Println("Checking")
+	// Check rows
+	for i, row := range hand {
+		var comparisonCard *card
+		// Check for non nil
+		for _, card := range row {
+			if card != nil {
+				comparisonCard = card
+				break
+			}
+		}
+		// Skip if whole row is nil
+		if comparisonCard == nil {
+			continue
+		}
+
+		equal := true
+
+		// Check every card against comparison card
+		for _, card := range row {
+			if card != nil && card.value != comparisonCard.value {
+				equal = false
+				break
+			}
+		}
+		if equal {
+			for j := range row {
+				hand[i][j] = nil
+			}
+		}
+	}
+
+	rows, cols := len(hand), len(hand[0])
+
+	// Check columns
+	for j := 0; j < cols; j++ {
+		var comparisonCard *card
+		// Check for non nil
+		for i := 0; i < rows; i++ {
+			if hand[i][j] != nil {
+				comparisonCard = hand[i][j]
+				break
+			}
+		}
+		// Skip if whole col is nil
+		if comparisonCard == nil {
+			continue
+		}
+
+		equal := true
+		for i := 0; i < rows; i++ {
+			if hand[i][j] != nil && hand[i][j].value != comparisonCard.value {
+				equal = false
+				break
+			}
+		}
+		if equal {
+			for i := 0; i < rows; i++ {
+				hand[i][j] = nil
+			}
+			// Possible that removal of column has caused row to all be equal so re-run check
+			checkRowCol(hand)
+		}
 	}
 }

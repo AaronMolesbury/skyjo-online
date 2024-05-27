@@ -1,0 +1,55 @@
+.Pile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 25%;
+}
+
+.Pile_Deck {
+    position: relative;
+    width: 150px;
+    height: 200px;
+    margin: 20px;
+}
+
+.Pile_FaceUpCard,
+.Pile_DeckCard {
+    width: 150px;
+    height: 200px;
+    border-radius: 5px;
+    border: 5px solid white;
+}
+
+.Pile_FaceUpCard {
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.Pile_DeckCard {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(50, 50, 50, .55) 25%, transparent 25%) -10px 0/ 20px 20px,
+                linear-gradient(225deg, rgba(50, 50, 50, 1) 25%, transparent 25%) -10px 0/ 20px 20px,
+                linear-gradient(315deg, rgba(50, 50, 50, .55) 25%, transparent 25%) 0px 0/ 20px 20px,
+                linear-gradient(45deg, rgba(50, 50, 50, 1) 25%, #e5e5f7 25%) 0px 0/ 20px 20px;
+}
+
+.Pile_DeckCard:nth-child(1) {
+    transform: translate(14px);
+}
+
+.Pile_DeckCard:nth-child(2) {
+    transform: translate(7px);
+}
+
+.Pile_DeckCard:nth-child(4) {
+    transform: translate(-7px);
+}
+
+.Pile_DeckCard:nth-child(5) {
+    transform: translate(-14px);
+}

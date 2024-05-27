@@ -2,6 +2,7 @@ import { useData, useWebSocket } from "../App"
 import "../css/GameWindow.css"
 import Button from "./Button";
 import CardGrid from "./CardGrid";
+import Pile from "./Pile";
 import Telemetry from "./Telemetry";
 import FlipTwo from "./gamestates/FlipTwo";
 import ForceSwap from "./gamestates/ForceSwap";
@@ -73,7 +74,9 @@ function GameWindow() {
                 lastDiscardedCardValue={data.lastDiscardedCard.value}
             />
             <div className="GameWindow_DeckWrapper">
+                <Pile headerLabel="Discard Pile" faceUpCard={data.lastDiscardedCard} hasDeck={true}/>
                 <CardGrid hand={hand}/>
+                <Pile headerLabel="Card in Hand" faceUpCard={data.cardInHand} hasDeck={false}/>
             </div>
             <div className="GameWindow_ButtonWrapper">
                 {currentGameState}

@@ -1,6 +1,7 @@
 import { ICardGridProps } from "../util/interfaces"
 import "../css/CardGrid.css"
 import { useWebSocket, useData } from "../App"
+import Card from "./Card.tsx"
 
 function CardGrid(props: ICardGridProps) {
     const ws = useWebSocket();
@@ -17,20 +18,7 @@ function CardGrid(props: ICardGridProps) {
             {props.hand.map((row, rowIndex) => (
                 <div className="CardGrid_Row" key={rowIndex}>
                     {row.map((card, colIndex) => (
-                        <div className="CardGrid_Card" key={colIndex} onClick={() => {
-                            if (!data.cardClickEnabled) {
-                                return;
-                            }
-
-                            // Stop flips on face up cards
-                            if ((data.gameState === "flip" || data.gameState === "flip-two") && card?.value) {
-                                return;
-                            }
-
-                            ws.send(`card-clicked;${colIndex};${rowIndex}`)
-                        }}>
-                            {card?.value}
-                        </div>
+                        <Card card={card} colIndex={colIndex} rowIndex={rowIndex}/>
                     ))}
                 </div>
             ))}

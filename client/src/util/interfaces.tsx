@@ -8,16 +8,6 @@ export interface ISocketData {
     players: {
         hand: Hand
     }[],
-    cardClickEnabled: boolean
-}
-
-export interface ICardGridProps {
-    hand: Hand
-}
-
-export interface IButtonProps {
-    clickHandler: React.MouseEventHandler<HTMLDivElement> | undefined,
-    labelText: string
 }
 
 export interface ITelemetryProps {
@@ -25,4 +15,29 @@ export interface ITelemetryProps {
     cardInHandValue: number | null,
     gameState: string,
     playerServerId: number
+}
+
+export interface IPileProps {
+    headerLabel: string,
+    faceUpCard: Card,
+    hasDeck: boolean
+}
+
+export interface IHeaderProps {
+    text: string
+}
+
+export interface ICardGridProps {
+    hand: Hand
+}
+
+export interface ICardProps {
+    card: Card | null,
+    colIndex: number,
+    rowIndex: number
+}
+
+export interface IButtonProps {
+    clickHandler: React.MouseEventHandler<HTMLDivElement> | undefined,
+    labelText: string
 }
