@@ -284,6 +284,7 @@ func checkColEquality(hand [][]*card) {
 			}
 		}
 		if equal {
+			lastDiscardedCard = *comparisonCard
 			for i := 0; i < rows; i++ {
 				hand[i][j] = nil
 			}

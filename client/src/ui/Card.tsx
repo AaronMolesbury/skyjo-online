@@ -32,7 +32,7 @@ function Card(props: ICardProps) {
     const value = props.card?.value ?? null;
 
     let className: string;
-    if ((value && FACE_UP_HOVER_ENABLED_GAMESTATES.includes(data.gameState)) || (!value && FACE_DOWN_HOVER_ENABLED_GAMESTATES.includes(data.gameState))) {
+    if ((value !== null && FACE_UP_HOVER_ENABLED_GAMESTATES.includes(data.gameState)) || (value === null && FACE_DOWN_HOVER_ENABLED_GAMESTATES.includes(data.gameState))) {
         className = "Card";
     } else {
         className = "Card disabled";
