@@ -3,6 +3,7 @@ import "../css/GameWindow.css"
 import Button from "./Button";
 import CardGrid from "./CardGrid";
 import Pile from "./Pile";
+import ScoreLabel from "./ScoreLabel";
 import Telemetry from "./Telemetry";
 import FlipTwo from "./gamestates/FlipTwo";
 import ForceSwap from "./gamestates/ForceSwap";
@@ -59,6 +60,11 @@ function GameWindow() {
                 <ForceSwap/>
             )
             break;
+        case "flip":
+            currentGameState = (
+                <div>Flip</div>
+            )
+        break;
         default:
             currentGameState = (
                 <div>Bad Game State...</div>
@@ -77,6 +83,7 @@ function GameWindow() {
                 <Pile headerLabel="Discard Pile" faceUpCard={data.lastDiscardedCard} hasDeck={true}/>
                 <CardGrid hand={hand}/>
                 <Pile headerLabel="Card in Hand" faceUpCard={data.cardInHand} hasDeck={false}/>
+                <ScoreLabel/>
             </div>
             <div className="GameWindow_ButtonWrapper">
                 {currentGameState}

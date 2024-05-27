@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import './App.css'
 import { ISocketData } from './util/interfaces';
 import GameWindow from './ui/GameWindow';
+import LobbyWindow from './ui/LobbyWindow';
 
 const WS_URL = "ws://localhost:8080";
 
@@ -35,10 +36,12 @@ function App() {
     }
   }, [])
 
+  const window = data ? <GameWindow/> : <LobbyWindow/>
+
   return (
     <WebSocketContext.Provider value={socket}>
       <DataContext.Provider value={data}>
-        <GameWindow/>
+        {window}
       </DataContext.Provider>
     </WebSocketContext.Provider>
   )

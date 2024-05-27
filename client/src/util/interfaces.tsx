@@ -8,6 +8,7 @@ export interface ISocketData {
     players: {
         hand: Hand
     }[],
+    score: number
 }
 
 export interface ITelemetryProps {

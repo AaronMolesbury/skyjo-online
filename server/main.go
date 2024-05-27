@@ -39,6 +39,7 @@ type socketData struct {
 	GameState   string             `json:"gameState"`
 	PlayerID    int                `json:"playerId"`
 	Players     []socketDataPlayer `json:"players"`
+	Score       int                `json:"score"`
 }
 
 const (
@@ -50,12 +51,16 @@ const (
 )
 
 var (
-	players           []*player
-	deck              []card
-	lastDiscardedCard card
-	currentCard       card
-	currentGameState  string
-	cardsFlipped      int
+	players            []*player
+	currentPlayerIndex int
+	currentPlayer      *player
+	deck               []card
+	lastDiscardedCard  card
+	currentCard        card
+	currentGameState   string
+	cardsFlipped       int
+	score              int
+	resetCard          card = card{value: -3}
 )
 
 func main() {
@@ -88,17 +93,26 @@ func handle(w http.ResponseWriter, r *http.Request) {
 		m := strings.Split(string(msg), ";")
 		msgCmd := m[0]
 
-		switch msgCmd {
-		case "ready":
+		if msgCmd == "ready" {
 			ready(player)
+			continue
+		}
+
+		if player != currentPlayer {
+			continue
+		}
+
+		switch msgCmd {
 		case "take-from-deck":
 			currentCard = takeFromDeck()
 			currentGameState = "swap-discard"
 		case "take-from-discard":
 			currentCard = lastDiscardedCard
+			lastDiscardedCard = resetCard
 			currentGameState = "force-swap"
 		case "discard":
 			lastDiscardedCard = currentCard
+			currentCard = resetCard
 			currentGameState = "flip"
 		case "card-clicked":
 			col, err := strconv.Atoi(m[1])
@@ -111,8 +125,7 @@ func handle(w http.ResponseWriter, r *http.Request) {
 			}
 			cardClicked(player.hand[row][col])
 		}
-		checkRowCol(player.hand)
-		broadcastState()
+		endMove(*player)
 	}
 }
 
@@ -142,15 +155,30 @@ func broadcastState() {
 			GameState:   currentGameState,
 			PlayerID:    i,
 			Players:     socketPlayers,
+			Score:       score,
 		})
 		player.conn.Write(context.Background(), websocket.MessageText, b)
 	}
 }
 
+func updateCurrentPlayer(override int) {
+	if override != -1 {
+		currentPlayerIndex = override
+	} else {
+		currentPlayerIndex += 1
+		if currentPlayerIndex == len(players) {
+			currentPlayerIndex = 0
+		}
+	}
+	currentPlayer = players[currentPlayerIndex]
+}
+
 func ready(player *player) {
 	player.ready = true
-	for _, p := range players {
+	for i, p := range players {
+		fmt.Printf("Player %d is %v \n", i, p.ready)
 		if !p.ready {
+			fmt.Println("not everyone is ready")
 			return
 		}
 	}
@@ -169,13 +197,14 @@ func beginGame() {
 			}
 		}
 	}
-
+	updateCurrentPlayer(0)
 	currentGameState = "flip-two"
+	broadcastState()
 }
 
 func resetDeck() {
 	deck = deck[:0]
-	currentCard = card{}
+	currentCard = resetCard
 
 	for i := 0; i < 5; i++ {
 		deck = append(deck, card{value: -2})
@@ -217,56 +246,27 @@ func cardClicked(cardClicked *card) {
 	} else if currentGameState == "flip" {
 		cardClicked.faceUp = true
 		currentGameState = "take-from"
+		updateCurrentPlayer(-1)
 		return
 	} else { // Swap
 		lastDiscardedCard = card{value: cardClicked.value}
 		cardClicked.value = currentCard.value
 		cardClicked.faceUp = true
 		currentGameState = "take-from"
+		updateCurrentPlayer(-1)
 	}
+	currentCard = resetCard
 }
 
-func checkRowCol(hand [][]*card) {
-	fmt.Println("Checking")
-	// Check rows
-	for i, row := range hand {
-		var comparisonCard *card
-		// Check for non nil
-		for _, card := range row {
-			if card != nil {
-				comparisonCard = card
-				break
-			}
-		}
-		// Skip if whole row is nil
-		if comparisonCard == nil {
-			continue
-		}
-
-		equal := true
-
-		// Check every card against comparison card
-		for _, card := range row {
-			if card != nil && card.value != comparisonCard.value {
-				equal = false
-				break
-			}
-		}
-		if equal {
-			for j := range row {
-				hand[i][j] = nil
-			}
-		}
-	}
-
+/* Special rule; if all cards in a col are face up & share the same value, that col will be removed */
+func checkColEquality(hand [][]*card) {
 	rows, cols := len(hand), len(hand[0])
-
 	// Check columns
 	for j := 0; j < cols; j++ {
 		var comparisonCard *card
 		// Check for non nil
 		for i := 0; i < rows; i++ {
-			if hand[i][j] != nil {
+			if hand[i][j] != nil && hand[i][j].faceUp {
 				comparisonCard = hand[i][j]
 				break
 			}
@@ -287,8 +287,31 @@ func checkRowCol(hand [][]*card) {
 			for i := 0; i < rows; i++ {
 				hand[i][j] = nil
 			}
-			// Possible that removal of column has caused row to all be equal so re-run check
-			checkRowCol(hand)
 		}
 	}
+}
+
+/* Check for if all cards in hand are face up */
+func checkScoreAndCompleteHand(hand [][]*card) bool {
+	complete := true
+	score = 0
+	for _, row := range hand {
+		for _, card := range row {
+			if card != nil && !card.faceUp {
+				complete = false
+			}
+			if card != nil && card.faceUp {
+				score += card.value
+			}
+		}
+	}
+	return complete
+}
+
+func endMove(player player) {
+	checkColEquality(player.hand)
+	if checkScoreAndCompleteHand(player.hand) {
+		currentGameState = "complete"
+	}
+	broadcastState()
 }

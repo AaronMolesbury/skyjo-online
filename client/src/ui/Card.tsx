@@ -38,13 +38,13 @@ function Card(props: ICardProps) {
         className = "Card disabled";
     }
 
+    const style = value !== null ? {background: cardColorLookup[value]} : {};
+
     return (
         <div 
         className={className}
         key={props.colIndex} 
-        style={
-            value ? {background: cardColorLookup[value]} : {}
-        } 
+        style={style} 
         onClick={() => {
             //Stop flips on face up cards
             if ((data.gameState === "flip" || data.gameState === "flip-two") && value) {
