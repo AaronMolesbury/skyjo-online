@@ -12,13 +12,11 @@ const FACE_DOWN_HOVER_ENABLED_GAMESTATES = [
     "swap-discard",
     "force-swap",
     "flip",
-    "flip-two",
 ];  
 
 function Card(props: ICardProps) {
     const ws = useWebSocket();
     const data = useData();
-
     if (!ws || !data) {
         return (
             <div>Bad Connection/Data @ Card</div>
@@ -30,9 +28,10 @@ function Card(props: ICardProps) {
     }
 
     const value = props.card?.value ?? null;
+    const player = data.players[data.playerId]
 
     let className: string;
-    if ((value !== null && FACE_UP_HOVER_ENABLED_GAMESTATES.includes(data.gameState)) || (value === null && FACE_DOWN_HOVER_ENABLED_GAMESTATES.includes(data.gameState))) {
+    if ((value !== null && FACE_UP_HOVER_ENABLED_GAMESTATES.includes(player.turnType)) || (value === null && FACE_DOWN_HOVER_ENABLED_GAMESTATES.includes(player.turnType))) {
         className = "Card";
     } else {
         className = "Card disabled";
@@ -47,7 +46,7 @@ function Card(props: ICardProps) {
         style={style} 
         onClick={() => {
             //Stop flips on face up cards
-            if ((data.gameState === "flip" || data.gameState === "flip-two") && value) {
+            if ((player.turnType === "flip") && value) {
                 return;
             }
 

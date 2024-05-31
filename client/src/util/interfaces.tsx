@@ -1,13 +1,19 @@
 import { Hand, Card } from "./types"
 
 export interface ISocketData {
-    lastDiscardedCard: Card,
-    cardInHand: Card,
-    gameState: string,
+    started: boolean,
+    lobbyCode: number,
+    lastDiscardedCard: Card | null,
+    cardInHand: Card | null,
     playerId: number,
-    players: {
-        hand: Hand
-    }[],
+    players: ISocketPlayer[],
+    currentPlayerId: number,
+    winnerId: number
+}
+
+export interface ISocketPlayer {
+    hand: Hand,
+    turnType: string,
     score: number
 }
 
@@ -20,7 +26,7 @@ export interface ITelemetryProps {
 
 export interface IPileProps {
     headerLabel: string,
-    faceUpCard: Card,
+    faceUpCard: Card | null,
     hasDeck: boolean
 }
 

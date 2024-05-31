@@ -5,7 +5,6 @@ import CardGrid from "./CardGrid";
 import Pile from "./Pile";
 import ScoreLabel from "./ScoreLabel";
 import Telemetry from "./Telemetry";
-import FlipTwo from "./gamestates/FlipTwo";
 import ForceSwap from "./gamestates/ForceSwap";
 import SwapDiscard from "./gamestates/SwapDiscard";
 import TakeFrom from "./gamestates/TakeFrom";
@@ -35,16 +34,18 @@ function GameWindow() {
         )
     }
 
+    if (data.winnerId !== -1) {
+        // TEMP while no landing screen
+        return (
+            <div>Player {data.winnerId} wins!</div>
+        )
+    }
+
     const playerId = data.playerId;
-    const hand = data.players[playerId].hand;
+    const player = data.players[playerId]
     
     let currentGameState: JSX.Element;
-    switch (data.gameState) {
-        case "flip-two":
-            currentGameState = (
-                <FlipTwo/>
-            )
-            break;
+    switch (player.turnType) {
         case "take-from":
             currentGameState = (
                 <TakeFrom/>
@@ -75,13 +76,13 @@ function GameWindow() {
         <div className="GameWindow">
             <Telemetry 
                 playerServerId={playerId}
-                gameState={data.gameState}
-                cardInHandValue={data.cardInHand.value}
-                lastDiscardedCardValue={data.lastDiscardedCard.value}
+                gameState={player.turnType}
+                cardInHandValue={data.cardInHand?.value ?? null}
+                lastDiscardedCardValue={data.lastDiscardedCard?.value ?? null}
             />
             <div className="GameWindow_DeckWrapper">
                 <Pile headerLabel="Discard Pile" faceUpCard={data.lastDiscardedCard} hasDeck={true}/>
-                <CardGrid hand={hand}/>
+                <CardGrid hand={player.hand}/>
                 <Pile headerLabel="Card in Hand" faceUpCard={data.cardInHand} hasDeck={false}/>
                 <ScoreLabel/>
             </div>

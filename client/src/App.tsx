@@ -23,12 +23,16 @@ function App() {
 
   useEffect(() => {
     // Create WebSocket connection.
-    const ws = new WebSocket(WS_URL);
+    const ws = new WebSocket(WS_URL + window.location.pathname);
     setSocket(ws);
 
     // Listen for messages - update data in GameState context
     ws.addEventListener("message", (event) => {
-      setData(JSON.parse(event.data as string));
+      const rawData = JSON.parse(event.data as string)
+      if (window.location.pathname === "/") {
+        history.pushState(null, "", "/" + rawData.lobbyCode);
+      }
+      setData(rawData);
     });
 
     return () => {
@@ -36,12 +40,10 @@ function App() {
     }
   }, [])
 
-  const window = data ? <GameWindow/> : <LobbyWindow/>
-
   return (
     <WebSocketContext.Provider value={socket}>
       <DataContext.Provider value={data}>
-        {window}
+        {data?.started ? <GameWindow/> : <LobbyWindow/>}
       </DataContext.Provider>
     </WebSocketContext.Provider>
   )

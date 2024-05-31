@@ -4,7 +4,7 @@ import { IPileProps } from "../util/interfaces";
 import { cardColorLookup } from "../util/cardColors";
 
 function Pile(props: IPileProps) {
-    if (props.faceUpCard.value === -3 && !props.hasDeck) {
+    if (!props.faceUpCard && !props.hasDeck) {
         // Reserves space for component
         return <div className="Pile"></div>
     }
@@ -23,7 +23,7 @@ function Pile(props: IPileProps) {
     }
 
     let card = <></>
-    if (props.faceUpCard.value !== -3) {
+    if (props.faceUpCard) {
         card = (
             <div 
             className="Pile_FaceUpCard" 

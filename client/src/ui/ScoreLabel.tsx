@@ -10,9 +10,11 @@ function ScoreLabel() {
         )
     }
 
+    const player = data.players[data.playerId]
+
     return (
         <div className="ScoreLabel">
-            <div className="ScoreLabel_Text">Score: {data.score}</div>
+            <div className="ScoreLabel_Text">Score: {player.score}</div>
         </div>
     )
 }
