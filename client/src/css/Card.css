@@ -12,16 +12,12 @@
     border: 5px solid white;
     cursor: pointer;
     transition: transform 0.25s;
-    background: linear-gradient(135deg, rgba(50, 50, 50, .55) 25%, transparent 25%) -10px 0/ 20px 20px,
-                linear-gradient(225deg, rgba(50, 50, 50, 1) 25%, transparent 25%) -10px 0/ 20px 20px,
-                linear-gradient(315deg, rgba(50, 50, 50, .55) 25%, transparent 25%) 0px 0/ 20px 20px,
-                linear-gradient(45deg, rgba(50, 50, 50, 1) 25%, white 25%) 0px 0/ 20px 20px;
+    background-image: url("/GreyCardTile.png");
+    background-repeat: repeat;
+    background-size: 20px 20px;
 }
 
 .Card:hover {
     transform: scale(1.15);
-    background: linear-gradient(135deg, rgba(70, 0, 135, .55) 25%, transparent 25%) -10px 0/ 20px 20px,
-                linear-gradient(225deg, rgba(70, 0, 135, 1) 25%, transparent 25%) -10px 0/ 20px 20px,
-                linear-gradient(315deg, rgba(70, 0, 135, .55) 25%, transparent 25%) 0px 0/ 20px 20px,
-                linear-gradient(45deg, rgba(70, 0, 135, 1) 25%, white 25%) 0px 0/ 20px 20px;
+    background-image: url("/PurpleCardTile.png");
 }
