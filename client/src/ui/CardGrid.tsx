@@ -1,6 +1,6 @@
 import { ICardGridProps } from "../util/interfaces"
 import "../css/CardGrid.css"
-import { useWebSocket, useData } from "../App"
+import { useWebSocket, useData } from "./LobbyScreen"
 import Card from "./Card.tsx"
 
 function CardGrid(props: ICardGridProps) {

@@ -1,5 +1,18 @@
 import { Hand, Card } from "./types"
 
+export interface ISiteConfig {
+    socketUrl: string
+}
+
+export interface ILobby {
+    lobbyCode: number | null
+}
+
+export interface IJoinCreateLobbyForm {
+    setLobbyCodeCallback: React.Dispatch<React.SetStateAction<number|null>>
+    setGameJoinedCallback: React.Dispatch<React.SetStateAction<boolean>>
+}
+
 export interface ISocketData {
     started: boolean,
     lobbyCode: number,
@@ -46,5 +59,6 @@ export interface ICardProps {
 
 export interface IButtonProps {
     clickHandler: React.MouseEventHandler<HTMLDivElement> | undefined,
-    labelText: string
+    labelText: string,
+    className?: string
 }

@@ -1,4 +1,4 @@
-import { useData, useWebSocket } from "../App"
+import { useData, useWebSocket } from "./LobbyScreen"
 import "../css/GameWindow.css"
 import Button from "./Button";
 import CardGrid from "./CardGrid";

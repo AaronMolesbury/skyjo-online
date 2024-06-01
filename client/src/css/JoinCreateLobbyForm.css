@@ -1,0 +1,43 @@
+/* Chromium */
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+
+/* Firefox */
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.JoinCreateLobbyForm_Input {
+    background-color: rgba(25, 25, 25, 1);
+    border: 1px solid rgba(15, 15, 15, 1);
+    border-radius: 5px;
+    font-size: 20px;
+    color: white;
+    margin-right: 5px;
+}
+
+.JoinCreateLobbyForm_Submit {
+    background-color: rgba(25, 25, 25, 1);
+    border: 1px solid rgba(15, 15, 15, 1);
+    border-radius: 5px;
+    font-size: 20px;
+    color: white;
+    cursor: pointer;
+}
+
+.JoinCreateLobbyForm_Submit:hover {
+    color: rgba(25, 25, 25, 1);
+    background-color: white;
+}
+
+.JoinCreateLobbyForm_Text {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 30px 0;
+}
+
+.JoinCreateLobbyForm_Button {
+    background-color: rgba(25, 25, 25, 1);
+}

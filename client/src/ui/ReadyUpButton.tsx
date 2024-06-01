@@ -1,10 +1,9 @@
-import { useWebSocket } from "../App"
+import { useWebSocket } from "./LobbyScreen"
 import { useState } from "react";
-import "../css/LobbyWindow.css"
 import "./Button"
 import Button from "./Button";
 
-function LobbyWindow() {
+function ReadyUpButton() {
     const ws = useWebSocket();
     const [ready, setReady] = useState(false);
 
@@ -22,12 +21,7 @@ function LobbyWindow() {
         readyStateComponent = <div>waiting for players</div>
     }
 
-    return (
-        <div className="LobbyWindow">
-            <div className="LobbyWindow_Title">TUMGA</div>
-            {readyStateComponent}
-        </div>
-    )
+    return readyStateComponent
 }
 
-export default LobbyWindow
+export default ReadyUpButton

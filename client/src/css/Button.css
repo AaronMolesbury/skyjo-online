@@ -10,6 +10,7 @@
     cursor: pointer;
 }
 
-.Button_Label {
-    color: white;
+.Button:hover {
+    background-color: white;
+    color: rgba(25, 25, 25, 1);
 }

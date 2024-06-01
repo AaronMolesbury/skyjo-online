@@ -1,4 +1,4 @@
-import { useWebSocket } from "../../App";
+import { useWebSocket } from "../LobbyScreen";
 import Button from "../Button"
 
 function TakeFrom() {

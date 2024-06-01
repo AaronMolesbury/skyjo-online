@@ -1,5 +1,5 @@
 import "../css/Card.css"
-import { useWebSocket, useData } from "../App"
+import { useWebSocket, useData } from "./LobbyScreen"
 import { cardColorLookup } from "../util/cardColors";
 import { ICardProps } from "../util/interfaces"
 

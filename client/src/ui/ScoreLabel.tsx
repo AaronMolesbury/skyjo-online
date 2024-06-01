@@ -1,4 +1,4 @@
-import { useData } from "../App"
+import { useData } from "./LobbyScreen"
 import "../css/ScoreLabel.css"
 
 function ScoreLabel() {

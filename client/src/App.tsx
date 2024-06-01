@@ -1,51 +1,28 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { useState } from 'react'
 import './App.css'
-import { ISocketData } from './util/interfaces';
-import GameWindow from './ui/GameWindow';
-import LobbyWindow from './ui/LobbyWindow';
+import JoinLobbyForm from './ui/JoinCreateLobbyForm'
+import LobbyScreen from './ui/LobbyScreen'
 
-const WS_URL = "ws://localhost:8080";
-
-const WebSocketContext = createContext<WebSocket|null>(null);
-const DataContext = createContext<ISocketData|null>(null);
-
-export function useWebSocket() {
-  return useContext(WebSocketContext);
-}
-
-export function useData() {
-  return useContext(DataContext);
-}
+const pathRegex = /^\/\d{6}$/
 
 function App() {
-  const [data, setData] = useState<ISocketData|null>(null);
-  const [socket, setSocket] = useState<WebSocket|null>(null)
+  const [lobbyCode, setLobbyCode] = useState<number | null>(null)
+  const [gameJoined, setGameJoined] = useState(false)
 
-  useEffect(() => {
-    // Create WebSocket connection.
-    const ws = new WebSocket(WS_URL + window.location.pathname);
-    setSocket(ws);
-
-    // Listen for messages - update data in GameState context
-    ws.addEventListener("message", (event) => {
-      const rawData = JSON.parse(event.data as string)
-      if (window.location.pathname === "/") {
-        history.pushState(null, "", "/" + rawData.lobbyCode);
-      }
-      setData(rawData);
-    });
-
-    return () => {
-      ws.close()
-    }
-  }, [])
+  if (!gameJoined && window.location.pathname.match(pathRegex)) {
+    const lc = Number(window.location.pathname.substring(1))
+    setLobbyCode(lc)
+    setGameJoined(true)
+  } else {
+    history.pushState(null, "", "/");
+  }
 
   return (
-    <WebSocketContext.Provider value={socket}>
-      <DataContext.Provider value={data}>
-        {data?.started ? <GameWindow/> : <LobbyWindow/>}
-      </DataContext.Provider>
-    </WebSocketContext.Provider>
+        <div className="App">
+            <div className="App_Title">SKYJO</div>
+            {gameJoined ? <LobbyScreen lobbyCode={lobbyCode}/> : <JoinLobbyForm setGameJoinedCallback={setGameJoined} setLobbyCodeCallback={setLobbyCode}/>}
+        </div>
+     
   )
 }
 
