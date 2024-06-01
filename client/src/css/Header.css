@@ -1,3 +1,16 @@
 .Header {
     font-size: 32px;
+    white-space: nowrap;
+}
+
+@media (max-width: 1250px) {
+    .Header {
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 500px) {
+    .Header {
+        font-size: 20px;
+    }
 }

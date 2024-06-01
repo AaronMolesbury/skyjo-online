@@ -14,3 +14,11 @@
     background-color: white;
     color: rgba(25, 25, 25, 1);
 }
+
+@media (max-width: 500px) {
+    .Button {
+        padding: 10px;
+        width: 115px;
+        height: 50px;
+    }
+}

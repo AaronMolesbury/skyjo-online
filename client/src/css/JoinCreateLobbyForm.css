@@ -41,3 +41,12 @@ input[type=number] {
 .JoinCreateLobbyForm_Button {
     background-color: rgba(25, 25, 25, 1);
 }
+
+@media (max-width: 500px) {
+    .JoinCreateLobbyForm_Button,
+    .JoinCreateLobbyForm_Text,
+    .JoinCreateLobbyForm_Submit,
+    .JoinCreateLobbyForm_Input { 
+        font-size: 15px;
+    }
+}

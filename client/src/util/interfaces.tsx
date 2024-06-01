@@ -5,7 +5,8 @@ export interface ISiteConfig {
 }
 
 export interface ILobby {
-    lobbyCode: number | null
+    lobbyCode: number | null,
+    setShowTitleCallback: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 export interface IJoinCreateLobbyForm {
@@ -37,10 +38,19 @@ export interface ITelemetryProps {
     playerServerId: number
 }
 
+export interface IPlayer {
+    player: ISocketPlayer | undefined,
+    isCurrentTurn: boolean,
+} 
+
+export interface IFaceUpCardProps {
+    faceUpCard: Card | null,
+}
+
 export interface IPileProps {
     headerLabel: string,
     faceUpCard: Card | null,
-    hasDeck: boolean
+    clickWsMsg: string
 }
 
 export interface IHeaderProps {

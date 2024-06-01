@@ -160,6 +160,11 @@ func (l *lobby) joinLobby(conn *websocket.Conn) {
 			continue
 		}
 
+		if msgCmd == "reset" {
+			l.beginGame()
+			continue
+		}
+
 		if pID != l.currentPlayerIndex {
 			continue
 		}
@@ -248,6 +253,7 @@ func (l *lobby) nextPlayer() {
 func (l *lobby) beginGame() {
 	l.started = true
 	l.resetDeck()
+	l.winnerID = -1
 	newDiscardedCard := l.takeFromDeck()
 	l.lastDiscardedCard = &newDiscardedCard
 	for _, player := range l.players {

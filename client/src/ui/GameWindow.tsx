@@ -2,16 +2,17 @@ import { useData, useWebSocket } from "./LobbyScreen"
 import "../css/GameWindow.css"
 import Button from "./Button";
 import CardGrid from "./CardGrid";
-import Pile from "./Pile";
 import ScoreLabel from "./ScoreLabel";
-import Telemetry from "./Telemetry";
-import ForceSwap from "./gamestates/ForceSwap";
-import SwapDiscard from "./gamestates/SwapDiscard";
-import TakeFrom from "./gamestates/TakeFrom";
+//import Telemetry from "./Telemetry";
+import { useEffect, useState } from "react";
+import Piles from "./Piles";
+import CardInHand from "./CardInHand";
 
 function GameWindow() {
     const ws = useWebSocket();
     const data = useData();
+
+    const [width, setWidth] = useState(window.innerWidth);
 
     if (!ws) {
         // TEMP while no landing screen
@@ -20,75 +21,70 @@ function GameWindow() {
         )
     }
 
-    const readyUpClicked = () => {
-        ws.send("ready");
+    const resetGameClicked = () => {
+        ws.send("reset");
     }
 
-    if (!data) {
-        return (
-            <div className="GameWindow">
-                <div className="GameWindow_ButtonWrapper">
-                   <Button clickHandler={readyUpClicked} labelText="Ready Up"/>
-                </div>
-            </div>
-        )
-    }
-
-    if (data.winnerId !== -1) {
+    if (data?.winnerId !== -1) {
         // TEMP while no landing screen
         return (
-            <div>Player {data.winnerId} wins!</div>
+            <>
+                <div>Player {data?.winnerId} wins!</div>
+                <Button clickHandler={resetGameClicked} labelText={"Restart?"}></Button>
+            </>
         )
     }
 
     const playerId = data.playerId;
     const player = data.players[playerId]
+
+    useEffect(() => {
+        const handleResize = () => {
+            setWidth(window.innerWidth);
+        }
+
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        }
+    }, []);
     
-    let currentGameState: JSX.Element;
-    switch (player.turnType) {
-        case "take-from":
-            currentGameState = (
-                <TakeFrom/>
-            )
-            break;
-        case "swap-discard":
-            currentGameState = (
-                <SwapDiscard/>
-            )
-            break;
-        case "force-swap":
-            currentGameState = (
-                <ForceSwap/>
-            )
-            break;
-        case "flip":
-            currentGameState = (
-                <div>Flip</div>
-            )
-        break;
-        default:
-            currentGameState = (
-                <div>Bad Game State...</div>
-            )
+    let deckWrapper: JSX.Element;
+    if (width <= 1250) {
+        deckWrapper = (
+            <>
+                <div className="GameWindow_DeckWrapper">
+                    <CardGrid hand={player.hand}/>
+                    <div className="GameWindow_PileWrapper">
+                        <Piles faceUpCard={data.lastDiscardedCard}/>
+                        <CardInHand faceUpCard={data.cardInHand}/>
+                    </div>
+                    <ScoreLabel/>
+                </div>
+            </>
+        )
+    } else {
+        deckWrapper = (
+            <>
+                <div className="GameWindow_DeckWrapper">
+                    <Piles faceUpCard={data.lastDiscardedCard}/>
+                    <CardGrid hand={player.hand}/>
+                    <CardInHand faceUpCard={data.cardInHand}/>
+                    <ScoreLabel/>
+                </div>
+            </>
+        )
     }
 
     return (
         <div className="GameWindow">
-            <Telemetry 
+            {/* <Telemetry 
                 playerServerId={playerId}
                 gameState={player.turnType}
                 cardInHandValue={data.cardInHand?.value ?? null}
                 lastDiscardedCardValue={data.lastDiscardedCard?.value ?? null}
-            />
-            <div className="GameWindow_DeckWrapper">
-                <Pile headerLabel="Discard Pile" faceUpCard={data.lastDiscardedCard} hasDeck={true}/>
-                <CardGrid hand={player.hand}/>
-                <Pile headerLabel="Card in Hand" faceUpCard={data.cardInHand} hasDeck={false}/>
-                <ScoreLabel/>
-            </div>
-            <div className="GameWindow_ButtonWrapper">
-                {currentGameState}
-            </div>
+            /> */}
+            {deckWrapper}
         </div>
     )
 }

@@ -1,0 +1,43 @@
+.LobbyScreen_InfoWrapper {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+}
+
+.LobbyScreen_LobbyText {
+    font-size: 28px;
+    margin-right: 20px;
+}
+
+.LobbyScreen_CopiedText {
+    color: green;
+    font-size: 28px;
+}
+
+.LobbyScreen_CopyURL {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-image: url("/CopyToClipboard.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    fill: white;
+    cursor: pointer;
+    transition: transform 0.25s;
+}
+
+.LobbyScreen_CopyURL:hover {
+    transform: scale(1.15);
+}
+
+@media (max-width: 500px) {
+    .LobbyScreen_InfoWrapper {
+        flex-direction: column;
+    }
+
+    .LobbyScreen_LobbyText {
+        margin-bottom: 15px;
+        margin-right: 0px;
+    }
+}

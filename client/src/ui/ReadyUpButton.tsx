@@ -18,7 +18,7 @@ function ReadyUpButton() {
 
     let readyStateComponent = <Button clickHandler={readyUpClicked} labelText="Ready Up"/>;
     if (ready) {
-        readyStateComponent = <div>waiting for players</div>
+        readyStateComponent = <div>Waiting for other players to ready up...</div>
     }
 
     return readyStateComponent

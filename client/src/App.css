@@ -11,5 +11,11 @@
     font-size: 72px;
     font-weight: bold;
     color: white;
-    margin: 30px;
+    margin-bottom: 30px;
+}
+
+@media (max-width: 500px) {
+    .App_Title {
+        font-size: 50px;
+    }
 }

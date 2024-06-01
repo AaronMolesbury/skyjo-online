@@ -22,3 +22,24 @@
     transform: scale(1.15);
     background-image: url("/PurpleCardTile.png");
 }
+
+@media (max-width: 1250px) {
+    .Card {
+        width: 75px;
+        height: 100px;
+        background-size: 10px 10px;
+        margin: 15px;
+        font-size: 26px;
+    }
+}
+
+@media (max-width: 500px) {
+    .Card {
+        width: 50px;
+        height: calc(100px/3 * 2);
+        background-size: calc(10px/3 * 2) calc(10px/3 * 2);
+        margin: 10px;
+        border: 3px solid white;
+        font-size: 20px;
+    }
+}
