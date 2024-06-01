@@ -14,6 +14,17 @@ function GameWindow() {
 
     const [width, setWidth] = useState(window.innerWidth);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setWidth(window.innerWidth);
+        }
+
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        }
+    }, []);
+
     if (!ws) {
         // TEMP while no landing screen
         return (
@@ -37,17 +48,6 @@ function GameWindow() {
 
     const playerId = data.playerId;
     const player = data.players[playerId]
-
-    useEffect(() => {
-        const handleResize = () => {
-            setWidth(window.innerWidth);
-        }
-
-        window.addEventListener("resize", handleResize);
-        return () => {
-            window.removeEventListener("resize", handleResize);
-        }
-    }, []);
     
     let deckWrapper: JSX.Element;
     if (width <= 1250) {
