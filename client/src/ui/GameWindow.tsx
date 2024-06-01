@@ -7,6 +7,7 @@ import ScoreLabel from "./ScoreLabel";
 import { useEffect, useState } from "react";
 import Piles from "./Piles";
 import CardInHand from "./CardInHand";
+import EndGameScreen from "./EndGameScreen";
 
 function GameWindow() {
     const ws = useWebSocket();
@@ -32,18 +33,10 @@ function GameWindow() {
         )
     }
 
-    const resetGameClicked = () => {
-        ws.send("reset");
-    }
+    
 
     if (data?.winnerId !== -1) {
-        // TEMP while no landing screen
-        return (
-            <>
-                <div>Player {data?.winnerId} wins!</div>
-                <Button clickHandler={resetGameClicked} labelText={"Restart?"}></Button>
-            </>
-        )
+        return <EndGameScreen/>;
     }
 
     const playerId = data.playerId;

@@ -1,0 +1,27 @@
+.EndGameScreen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.EndGameScreen_WinnerText {
+    font-weight: bold;
+    font-size: 60px;
+    margin-bottom: 50px;
+}
+
+.EndGameScreen_WaitingText {
+    font-size: 20px;
+}
+
+@media (max-width: 500px) {
+    .EndGameScreen_WinnerText {
+        font-size: 40px;
+        margin-bottom: 30px;
+    }
+
+    .EndGameScreen_WaitingText {
+        font-size: 15px;
+    }
+}
