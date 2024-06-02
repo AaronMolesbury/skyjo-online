@@ -1,18 +1,8 @@
-import { ICardGridProps } from "../util/interfaces"
-import "../css/CardGrid.css"
-import { useWebSocket, useData } from "./LobbyScreen"
-import Card from "./Card.tsx"
+import { ICardGridProps } from "../util/interfaces";
+import "../css/CardGrid.css";
+import Card from "./Card.tsx";
 
 function CardGrid(props: ICardGridProps) {
-    const ws = useWebSocket();
-    const data = useData();
-
-    if (!ws || !data) {
-        return (
-            <div>Bad Connection/Data @ CardGrid</div>
-        )
-    }
-
     return (
         <div className="CardGrid">
             {props.hand.map((row, rowIndex) => (
@@ -23,7 +13,7 @@ function CardGrid(props: ICardGridProps) {
                 </div>
             ))}
         </div>
-    )
+    );
 }
 
 export default CardGrid

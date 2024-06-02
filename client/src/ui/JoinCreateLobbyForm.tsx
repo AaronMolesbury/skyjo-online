@@ -1,6 +1,6 @@
 import { BaseSyntheticEvent } from "react";
-import "../css/JoinCreateLobbyForm.css";
 import { IJoinCreateLobbyForm } from "../util/interfaces";
+import "../css/JoinCreateLobbyForm.css";
 import Button from "./Button";
 
 function JoinCreateLobbyForm(props: IJoinCreateLobbyForm) {
@@ -41,7 +41,7 @@ function JoinCreateLobbyForm(props: IJoinCreateLobbyForm) {
             <div className="JoinCreateLobbyForm_Text">Or</div>
             <Button className="JoinCreateLobbyForm_Button" clickHandler={createClicked} labelText={"Create Lobby"}/>
         </>
-    )
+    );
 }
 
 export default JoinCreateLobbyForm

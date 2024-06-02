@@ -1,5 +1,5 @@
-import { IButtonProps } from "../util/interfaces"
-import "../css/Button.css"
+import { IButtonProps } from "../util/interfaces";
+import "../css/Button.css";
 
 function Button(props: IButtonProps) {
     let className = "Button ";
@@ -11,7 +11,7 @@ function Button(props: IButtonProps) {
         <div className={className} onClick={props.clickHandler}>
             <div className="Button_Label">{props.labelText}</div>
         </div>
-    )
+    );
 }
 
 export default Button

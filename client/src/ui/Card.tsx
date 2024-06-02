@@ -1,7 +1,8 @@
-import "../css/Card.css"
-import { useWebSocket, useData } from "./LobbyScreen"
+import { useWebSocket } from "./LobbyScreen";
+import { usePlayer } from "../util/hooks";
 import { cardColorLookup } from "../util/cardColors";
-import { ICardProps } from "../util/interfaces"
+import { ICardProps } from "../util/interfaces";
+import "../css/Card.css";
 
 const FACE_UP_HOVER_ENABLED_GAMESTATES = [
     "swap-discard",
@@ -16,22 +17,18 @@ const FACE_DOWN_HOVER_ENABLED_GAMESTATES = [
 
 function Card(props: ICardProps) {
     const ws = useWebSocket();
-    const data = useData();
-    if (!ws || !data) {
-        return (
-            <div>Bad Connection/Data @ Card</div>
-        )
-    }
-
-    if (!props.card) {
-        return <></>
+    const {player} = usePlayer();
+    if (!ws || !player || !props.card) {
+        return;
     }
 
     const value = props.card?.value ?? null;
-    const player = data.players[data.playerId]
 
     let className: string;
-    if ((value !== null && FACE_UP_HOVER_ENABLED_GAMESTATES.includes(player.turnType)) || (value === null && FACE_DOWN_HOVER_ENABLED_GAMESTATES.includes(player.turnType))) {
+    if (
+        (value !== null && FACE_UP_HOVER_ENABLED_GAMESTATES.includes(player.turnType)) ||
+        (value === null && FACE_DOWN_HOVER_ENABLED_GAMESTATES.includes(player.turnType))
+    ) {
         className = "Card";
     } else {
         className = "Card disabled";
@@ -50,11 +47,11 @@ function Card(props: ICardProps) {
                 return;
             }
 
-            ws.send(`card-clicked;${props.colIndex};${props.rowIndex}`)
+            ws.send(`card-clicked;${props.colIndex};${props.rowIndex}`);
         }}>
             {value}
         </div>
-    )
+    );
 }
 
 export default Card

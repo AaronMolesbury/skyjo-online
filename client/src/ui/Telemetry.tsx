@@ -1,6 +1,7 @@
 import { ITelemetryProps } from "../util/interfaces"
 import "../css/Telemetry.css"
 
+// Was used as QoL for early dev debugging
 function Telemetry(props: ITelemetryProps) {
     return (
         <div className="Telemetry">
@@ -9,7 +10,7 @@ function Telemetry(props: ITelemetryProps) {
             <div className="Telemetry_Data">Card in Hand: {props.cardInHandValue}</div>
             <div className="Telemetry_Data">Last Discarded Card: {props.lastDiscardedCardValue}</div>
         </div>
-    )
+    );
 }
 
 export default Telemetry

@@ -1,0 +1,21 @@
+.CopyCodeButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background-image: url("/CopyToClipboard.svg");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    fill: white;
+    cursor: pointer;
+    transition: transform 0.25s;
+}
+
+.CopyCodeButton {
+    transform: scale(1.15);
+}
+
+.CopyCodeButton_Text {
+    color: green;
+    font-size: 28px;
+}

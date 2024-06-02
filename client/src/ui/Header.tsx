@@ -6,7 +6,7 @@ function Header(props: IHeaderProps) {
         <div className="Header">
             {props.text}
         </div>
-    )
+    );
 }
 
 export default Header

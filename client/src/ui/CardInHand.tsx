@@ -19,7 +19,7 @@ function CardInHand (props: IFaceUpCardProps) {
             <Header text={"Card In Hand"}/>
             {card}
         </div>
-    )
+    );
 }
 
 export default CardInHand

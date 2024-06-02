@@ -1,6 +1,6 @@
-import Button from "./Button";
 import { useData, useWebSocket } from "./LobbyScreen";
 import "../css/EndGameScreen.css"
+import Button from "./Button";
 
 function EndGameScreen() {
     const ws = useWebSocket();
@@ -19,7 +19,7 @@ function EndGameScreen() {
                 <div className="EndGameScreen_WaitingText">Waiting for the host to start a new game...</div>
             )}
         </div>
-    )
+    );
 }
 
 export default EndGameScreen

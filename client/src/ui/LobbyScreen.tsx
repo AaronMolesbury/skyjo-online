@@ -1,11 +1,12 @@
-import { createContext, useContext, useEffect, useState } from 'react'
-import { ISiteConfig, ISocketData, ILobby } from '../util/interfaces'
-import SITE_CONFIG from './SiteConfig'
+import { createContext, useContext, useEffect, useState } from 'react';
+import { ISiteConfig, ISocketData, ILobby } from '../util/interfaces';
+import "../css/LobbyScreen.css";
+import SITE_CONFIG from './SiteConfig';
 import ReadyUpButton from './ReadyUpButton';
 import GameWindow from './GameWindow';
-import "../css/LobbyScreen.css"
+import CopyCodeButton from './CopyCodeButton';
 
-const SiteConfigContext = createContext<ISiteConfig>(SITE_CONFIG)
+const SiteConfigContext = createContext<ISiteConfig>(SITE_CONFIG);
 const WebSocketContext = createContext<WebSocket|null>(null);
 const DataContext = createContext<ISocketData|null>(null);
 
@@ -13,20 +14,21 @@ export function useSiteConfig() {
   return useContext(SiteConfigContext);
 }
 
+// Access to ws connection
 export function useWebSocket() {
   return useContext(WebSocketContext);
 }
 
+// Access to top level data received from ws
 export function useData() {
   return useContext(DataContext);
 }
 
 function LobbyScreen(props: ILobby) {
-    const siteConfig = useSiteConfig()
+    const siteConfig = useSiteConfig();
 
     const [data, setData] = useState<ISocketData|null>(null);
-    const [socket, setSocket] = useState<WebSocket|null>(null)
-    const [copied, setCopied] = useState<boolean>(false);
+    const [socket, setSocket] = useState<WebSocket|null>(null);
 
     useEffect(() => {
         // Create WebSocket connection.
@@ -34,9 +36,9 @@ function LobbyScreen(props: ILobby) {
         const ws = new WebSocket(socketUrl);
         setSocket(ws);
 
-        // Listen for messages - update data in GameState context
+        // Listen for messages - update data in DataContext
         ws.addEventListener("message", (event) => {
-            const rawData = JSON.parse(event.data as string)
+            const rawData = JSON.parse(event.data as string);
             setData(rawData);
             if (window.location.pathname === "/") {
                 history.pushState(null, "", "/" + rawData.lobbyCode);
@@ -44,34 +46,27 @@ function LobbyScreen(props: ILobby) {
         });
 
         return () => {
-            ws.close()
+            ws.close();
         }
     }, [])
 
-    const copyClicked = () => {
-        if (socket && data) {
-            navigator.clipboard.writeText(data?.lobbyCode + "");
-            setCopied(true)
-        }
-    }
-
     let content: JSX.Element;
     if (!socket || !data)  {
-        content = <div>Failed to create lobby - Please refresh</div>
+        content = <div>Failed to create lobby - Please refresh</div>;
     } else {
         if (data.started) {
-            props.setShowTitleCallback(false)
-            content = <GameWindow/>
+            props.setShowTitleCallback(false);
+            content = <GameWindow/>;
         } else {
             content =  (
                 <>
                     <div className="LobbyScreen_InfoWrapper">
                         <div className="LobbyScreen_LobbyText">Lobby: {data?.lobbyCode}</div>
-                        {copied ? <div className="LobbyScreen_CopiedText">Link Copied!</div> : <div className="LobbyScreen_CopyURL" onClick={copyClicked}></div>}
+                        <CopyCodeButton/>
                     </div>
                     <ReadyUpButton/>
                 </>
-            )
+            );
         }
     }
 
@@ -81,7 +76,7 @@ function LobbyScreen(props: ILobby) {
                 {content}
             </DataContext.Provider>
         </WebSocketContext.Provider>
-    )
+    );
 }
 
 export default LobbyScreen

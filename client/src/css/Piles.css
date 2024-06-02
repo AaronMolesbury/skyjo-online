@@ -67,20 +67,6 @@
     transform: translate(-14px);
 }
 
-.Piles_DiscardButton {
-    width: 50px;
-    height: 50px;
-    cursor: pointer;
-    transition: transform 0.25s;
-    background-image: url("/Discard.svg");
-    background-repeat: no-repeat;
-    background-size: contain;
-}
-
-.Piles_DiscardButton:hover {
-    transform: scale(1.15);
-}
-
 @media (max-width: 1250px) {
     .Piles {
         width: 100%;

@@ -1,18 +1,16 @@
-import { useData, useWebSocket } from "./LobbyScreen"
-import "../css/GameWindow.css"
-import Button from "./Button";
+import { useEffect, useState } from "react";
+import { usePlayer } from "../util/hooks";
+import { useData } from "./LobbyScreen";
+import "../css/GameWindow.css";
 import CardGrid from "./CardGrid";
 import ScoreLabel from "./ScoreLabel";
-//import Telemetry from "./Telemetry";
-import { useEffect, useState } from "react";
 import Piles from "./Piles";
 import CardInHand from "./CardInHand";
 import EndGameScreen from "./EndGameScreen";
 
 function GameWindow() {
-    const ws = useWebSocket();
     const data = useData();
-
+    const {player} = usePlayer();
     const [width, setWidth] = useState(window.innerWidth);
 
     useEffect(() => {
@@ -24,23 +22,15 @@ function GameWindow() {
         return () => {
             window.removeEventListener("resize", handleResize);
         }
-    }, []);
+    }, []);    
 
-    if (!ws) {
-        // TEMP while no landing screen
-        return (
-            <div>Loading...</div>
-        )
+    if (!player) {
+        return;
     }
-
-    
 
     if (data?.winnerId !== -1) {
         return <EndGameScreen/>;
     }
-
-    const playerId = data.playerId;
-    const player = data.players[playerId]
     
     let deckWrapper: JSX.Element;
     if (width <= 1250) {
@@ -55,7 +45,7 @@ function GameWindow() {
                     <ScoreLabel/>
                 </div>
             </>
-        )
+        );
     } else {
         deckWrapper = (
             <>
@@ -66,20 +56,14 @@ function GameWindow() {
                     <ScoreLabel/>
                 </div>
             </>
-        )
+        );
     }
 
     return (
         <div className="GameWindow">
-            {/* <Telemetry 
-                playerServerId={playerId}
-                gameState={player.turnType}
-                cardInHandValue={data.cardInHand?.value ?? null}
-                lastDiscardedCardValue={data.lastDiscardedCard?.value ?? null}
-            /> */}
             {deckWrapper}
         </div>
-    )
+    );
 }
 
 export default GameWindow

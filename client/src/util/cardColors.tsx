@@ -22,4 +22,4 @@ export const cardColorLookup: {[key: number]: string} = {
     [10]: CardColor.RED,
     [11]: CardColor.RED,
     [12]: CardColor.RED,
-}
+};
