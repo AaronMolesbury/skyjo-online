@@ -15,9 +15,11 @@ import (
 	"nhooyr.io/websocket"
 )
 
+/* Structs */
+
 type lobby struct {
 	started            bool
-	joinCode           int
+	lobbyCode          int
 	players            []*player
 	deck               []card
 	lastDiscardedCard  *card
@@ -48,6 +50,8 @@ func (c *card) equalValue(c2 *card) bool {
 	return c.value == c2.value
 }
 
+/* WS Structs */
+
 type socketDataCard struct {
 	Value *int `json:"value"`
 }
@@ -70,11 +74,12 @@ type socketData struct {
 }
 
 const (
-	MIN_PLAYER_COUNT   int = 2
-	MAX_PLAYER_COUNT   int = 8
-	DECK_SIZE          int = 150
-	HAND_SIZE          int = 12
-	MAX_CARD_FREQUENCY int = 15
+	MIN_RAND_LOBBY_VAL  = 100000
+	MAX_RAND_LOBBY_VAL  = 999999
+	MAX_MINUS_TWO_CARDS = 5
+	MAX_ZERO_CARDS      = 15
+	MAX_OTHER_CARDS     = 10
+	MIN_PLAYERS         = 2
 )
 
 var lobbies = make(map[int]*lobby)
@@ -110,22 +115,24 @@ func handle(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func createLobby(conn *websocket.Conn) {
-	code := 0
-	for i := 0; i < 5; i++ {
-		code = 100000 + rand.Intn(999999-100000)
+/* Lobby Methods */
 
-		if lobbies[code] == nil {
+func createLobby(conn *websocket.Conn) {
+	c := 0
+	for i := 0; i < 5; i++ {
+		c = MIN_RAND_LOBBY_VAL + rand.Intn(MAX_RAND_LOBBY_VAL-MIN_RAND_LOBBY_VAL)
+
+		if lobbies[c] == nil {
 			break
 		}
 	}
 
 	l := &lobby{
-		joinCode: code,
-		winnerID: -1,
+		lobbyCode: c,
+		winnerID:  -1,
 	}
 
-	lobbies[code] = l
+	lobbies[c] = l
 
 	l.joinLobby(conn)
 }
@@ -142,7 +149,7 @@ func (l *lobby) joinLobby(conn *websocket.Conn) {
 		i := slices.Index(l.players, p)
 		l.players = slices.Delete(l.players, i, i+1)
 		if len(l.players) == 0 {
-			delete(lobbies, l.joinCode)
+			delete(lobbies, l.lobbyCode)
 		}
 	}()
 
@@ -171,8 +178,8 @@ func (l *lobby) joinLobby(conn *websocket.Conn) {
 
 		switch msgCmd {
 		case "take-from-deck":
-			newCard := l.takeFromDeck()
-			l.currentCard = &newCard
+			c := l.takeFromDeck()
+			l.currentCard = &c
 			p.turnType = "swap-discard"
 		case "take-from-discard":
 			l.currentCard = l.lastDiscardedCard
@@ -197,15 +204,16 @@ func (l *lobby) joinLobby(conn *websocket.Conn) {
 	}
 }
 
+// Generates & sends data to ui
 func (l *lobby) broadcastState() {
 	var socketPlayers []socketDataPlayer
-	for _, player := range l.players {
+	for _, p := range l.players {
 		socketPlayer := socketDataPlayer{
-			TurnType: player.turnType,
-			Score:    player.currentScore,
+			TurnType: p.turnType,
+			Score:    p.currentScore,
 		}
-		socketPlayer.TurnType = player.turnType
-		for _, row := range player.hand {
+		socketPlayer.TurnType = p.turnType
+		for _, row := range p.hand {
 			var socketRow []*socketDataCard
 			for _, card := range row {
 				if card == nil {
@@ -220,10 +228,10 @@ func (l *lobby) broadcastState() {
 		}
 		socketPlayers = append(socketPlayers, socketPlayer)
 	}
-	for i, player := range l.players {
+	for i, p := range l.players {
 		sd := socketData{
 			Started:         l.started,
-			LobbyCode:       l.joinCode,
+			LobbyCode:       l.lobbyCode,
 			PlayerID:        i,
 			Players:         socketPlayers,
 			CurrentPlayerID: l.currentPlayerIndex,
@@ -239,7 +247,7 @@ func (l *lobby) broadcastState() {
 		}
 
 		b, _ := json.Marshal(sd)
-		player.conn.Write(context.Background(), websocket.MessageText, b)
+		p.conn.Write(context.Background(), websocket.MessageText, b)
 	}
 }
 
@@ -254,15 +262,15 @@ func (l *lobby) beginGame() {
 	l.started = true
 	l.resetDeck()
 	l.winnerID = -1
-	newDiscardedCard := l.takeFromDeck()
-	l.lastDiscardedCard = &newDiscardedCard
-	for _, player := range l.players {
-		player.turnType = "flip"
+	c := l.takeFromDeck()
+	l.lastDiscardedCard = &c
+	for _, p := range l.players {
+		p.turnType = "flip"
 		for row := 0; row < 3; row++ {
-			player.hand = append(player.hand, make([]*card, 4))
+			p.hand = append(p.hand, make([]*card, 4))
 			for col := 0; col < 4; col++ {
-				newCard := l.takeFromDeck()
-				player.hand[row][col] = &newCard
+				nc := l.takeFromDeck()
+				p.hand[row][col] = &nc
 			}
 		}
 	}
@@ -272,9 +280,9 @@ func (l *lobby) beginGame() {
 
 func (l *lobby) endGame() {
 	l.winnerID = 0
-	for i, player := range l.players {
-		player.turnType = "gameOver"
-		if player.currentScore < l.players[l.winnerID].currentScore {
+	for i, p := range l.players {
+		p.turnType = "gameOver"
+		if p.currentScore < l.players[l.winnerID].currentScore {
 			l.winnerID = i
 		}
 	}
@@ -285,11 +293,11 @@ func (l *lobby) resetDeck() {
 	l.deck = l.deck[:0]
 	l.currentCard = nil
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < MAX_MINUS_TWO_CARDS; i++ {
 		l.deck = append(l.deck, card{value: -2})
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < MAX_OTHER_CARDS; i++ {
 		for j := -1; j < 13; j++ {
 			if j == 0 {
 				continue
@@ -298,7 +306,7 @@ func (l *lobby) resetDeck() {
 		}
 	}
 
-	for i := 0; i < 15; i++ {
+	for i := 0; i < MAX_ZERO_CARDS; i++ {
 		l.deck = append(l.deck, card{value: 0})
 	}
 }
@@ -314,7 +322,7 @@ func (l *lobby) takeFromDeck() card {
 
 func (p *player) ready() {
 	p.isReady = true
-	if len(p.lobby.players) < 2 {
+	if len(p.lobby.players) < MIN_PLAYERS {
 		return
 	}
 	for _, player := range p.lobby.players {
@@ -325,17 +333,17 @@ func (p *player) ready() {
 	p.lobby.beginGame()
 }
 
-func (p *player) cardClicked(cardClicked *card) {
+func (p *player) cardClicked(c *card) {
 	if p.turnType == "flip" {
-		cardClicked.faceUp = true
+		c.faceUp = true
 		if p.countFaceUpCards() >= 2 {
 			p.turnType = "take-from"
 			p.lobby.nextPlayer()
 		}
 	} else { // Swap
-		p.lobby.lastDiscardedCard = &card{value: cardClicked.value, faceUp: true}
-		cardClicked.value = p.lobby.currentCard.value
-		cardClicked.faceUp = true
+		p.lobby.lastDiscardedCard = &card{value: c.value, faceUp: true}
+		c.value = p.lobby.currentCard.value
+		c.faceUp = true
 		p.turnType = "take-from"
 		p.lobby.nextPlayer()
 	}
@@ -343,15 +351,15 @@ func (p *player) cardClicked(cardClicked *card) {
 }
 
 func (p *player) countFaceUpCards() int {
-	count := 0
+	ct := 0
 	for _, row := range p.hand {
-		for _, card := range row {
-			if card != nil && card.faceUp {
-				count += 1
+		for _, c := range row {
+			if c != nil && c.faceUp {
+				ct += 1
 			}
 		}
 	}
-	return count
+	return ct
 }
 
 /* Special rule - if all cards in a col are face up & share the same value, that col will be removed */
@@ -393,12 +401,12 @@ func (p *player) checkScoreAndCompleteHand() bool {
 	complete := true
 	p.currentScore = 0
 	for _, row := range p.hand {
-		for _, card := range row {
-			if card != nil && !card.faceUp {
+		for _, c := range row {
+			if c != nil && !c.faceUp {
 				complete = false
 			}
-			if card != nil && card.faceUp {
-				p.currentScore += card.value
+			if c != nil && c.faceUp {
+				p.currentScore += c.value
 			}
 		}
 	}
@@ -435,12 +443,12 @@ func (p *player) endMove() {
 }
 
 func (p *player) flipAllCards() {
-	totalScore := 0
+	s := 0
 	for _, row := range p.hand {
-		for _, card := range row {
-			card.faceUp = true
-			totalScore += card.value
+		for _, c := range row {
+			c.faceUp = true
+			s += c.value
 		}
 	}
-	p.currentScore = totalScore
+	p.currentScore = s
 }
