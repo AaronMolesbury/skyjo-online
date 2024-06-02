@@ -7,6 +7,10 @@ Complete & playable but still has some Quality of Life/UX TODOs (see [TODOS](#TO
 
 ## Screenshots
 
+![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/f3aa3e4d-e483-47ff-9cb3-66291f427de9)
+![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/7f8d34ac-a836-4a67-af02-ec55566997eb)
+![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/d73adcc9-c075-4b45-9b2e-41cdeb829174)
+![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/f1533e2a-fb9c-4739-987c-5aeb1f69468b)
 
 
 ## Installation & Setup
@@ -39,7 +43,7 @@ and run
 
 ## <a name="TODOs"></a> TODOs 
 There are a few Quality of Life and UX changes I'd like to make when I have the time:
-
+- Deploy it
 - Preview other players hands when it's there go so all users understand what's going on
 - Improve error handling both in UI & Server
 - Animations?
