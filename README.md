@@ -9,7 +9,7 @@ Complete & playable but still has some Quality of Life/UX TODOs (see [TODOS](#TO
 
 ![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/f3aa3e4d-e483-47ff-9cb3-66291f427de9)
 ![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/7f8d34ac-a836-4a67-af02-ec55566997eb)
-![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/d73adcc9-c075-4b45-9b2e-41cdeb829174)
+![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/e02123fe-f83c-4db5-8d89-fb9a05bf3ca4)
 ![image](https://github.com/AaronMolesbury/skyjo-online/assets/55638411/f1533e2a-fb9c-4739-987c-5aeb1f69468b)
 
 
