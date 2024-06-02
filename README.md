@@ -44,6 +44,7 @@ and run
 ## <a name="TODOs"></a> TODOs 
 There are a few Quality of Life and UX changes I'd like to make when I have the time:
 - Deploy it
+- Improve responsiveness
 - Preview other players hands when it's there go so all users understand what's going on
 - Improve error handling both in UI & Server
 - Animations?
