@@ -85,10 +85,6 @@
         background-size: 10px 10px;
         font-size: 26px;
     }
-
-    .Piles_FaceUpCard {
-        margin: 15px;
-    }
 }
 
 @media (max-width: 500px) {
@@ -107,10 +103,6 @@
         font-size: 20px;
     }
 
-    .Piles_FaceUpCard {
-        margin: 10px;
-    }
-
     .Piles_DeckCard:nth-child(1) {
         transform: translate(10px);
     }
@@ -123,6 +115,7 @@
         transform: translate(-5px);
     }
     
+    .Piles_FaceUpCard,
     .Piles_DeckCard:nth-child(5) {
         transform: translate(-10px);
     }
